@@ -15,6 +15,9 @@ r"""
 \\end{frame}
 """),
 
+        # Replace single linebreaks with double linebreaks.
+        (r'([^\n])\n([^\n])', r'\1\n\n\2'),
+
         # Add header.
         (r'\A',
 r"""\\documentclass[10pt, compress]{beamer}
