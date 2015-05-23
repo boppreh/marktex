@@ -3,8 +3,8 @@ from subprocess import call, Popen
 import os
 from glob import glob
 
-rules = {
-        r'\A':
+rules = [
+        (r'\A',
 r"""
 \\documentclass[10pt, compress]{beamer}
 
@@ -17,20 +17,26 @@ r"""
 \\usemintedstyle{trac}
 
 \\begin{document}
-""",
+"""),
 
-        r'\Z':
+        (r'^#\s?([^#].+?)#?$', r'\\section{\1}'),
+
+        (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z)',
+r"""
+\\begin{frame}{\1}
+\2
+\\end{frame}
+"""),
+
+        (r'\Z',
 r"""
 \\end{document}
-""",
-
-        r'^#\s?(.+?)#?$': r'\\section{\1}',
-
-}
+"""),
+]
 
 def apply_rules(rules, src):
-    for rule, replacement in rules.items():
-        src = re.sub(rule, replacement, src, flags=re.MULTILINE)
+    for rule, replacement in rules:
+        src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
     return src
 
 XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
@@ -50,6 +56,8 @@ def generate_pdf(tex_src):
 if __name__ == '__main__':
     src = """
 # Primeira seção
+
+## Título do slide
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
