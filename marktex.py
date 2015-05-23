@@ -4,9 +4,20 @@ import os
 from glob import glob
 
 rules = [
-        (r'\A',
+        # Use # to start sections.
+        (r'^#\s?([^#].+?)#?$', r'\\section{\1}'),
+
+        # Use ## to title slides.
+        (r'^##\s?(.+?)(?:##)?$((?:\n|.)+?)(?=##|\Z)',
 r"""
-\\documentclass[10pt, compress]{beamer}
+\\begin{frame}{\1}
+\2
+\\end{frame}
+"""),
+
+        # Add header.
+        (r'\A',
+r"""\\documentclass[10pt, compress]{beamer}
 
 \\usetheme{m}
 
@@ -19,24 +30,13 @@ r"""
 \\begin{document}
 """),
 
-        (r'^#\s?([^#].+?)#?$', r'\\section{\1}'),
-
-        (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z)',
-r"""
-\\begin{frame}{\1}
-\2
-\\end{frame}
-"""),
-
-        (r'\Z',
-r"""
-\\end{document}
-"""),
+        # Add footer.
+        (r'\Z', r'\\end{document}'),
 ]
 
 def apply_rules(rules, src):
     for rule, replacement in rules:
-        src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
+        src = re.sub(rule, replacement, src, flags=re.MULTILINE)
     return src
 
 XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
@@ -46,7 +46,6 @@ def generate_pdf(tex_src):
     tex_location = 'demo.tex'
     with open(tex_location, 'w', encoding='utf-8') as file:
         file.write(tex_src)
-    call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
     call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
     for temp_file in glob('demo.*'):
         if temp_file != 'demo.pdf':
@@ -58,6 +57,9 @@ if __name__ == '__main__':
 # Primeira seção
 
 ## Título do slide
+
+- Bullet 1
+- Bullet 2
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
