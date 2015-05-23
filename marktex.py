@@ -1,6 +1,7 @@
 import re
-from subprocess import call
+from subprocess import call, Popen
 import os
+from glob import glob
 
 rules = {
         r'\A':
@@ -52,7 +53,7 @@ if __name__ == '__main__':
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
-    os.system('start "{}"'.format(generate_pdf(tex_src)))
+    Popen(['start', generate_pdf(tex_src)], shell=True)
     exit()
     from sys import argv
     if len(argv) <= 1:
