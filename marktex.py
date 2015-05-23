@@ -15,12 +15,24 @@ r"""
 \\end{frame}
 """),
 
+        # Begin and end itemize for bullet points.
+        (r'((?:^-\s*[^-\n]+\n*){2,})',
+r"""
+\\begin{itemize}
+\1
+\\end{itemize}
+"""),
+
+        # Add \item to each bullet point.
+        (r'^-\s*([^-\n]+)$', lambda m: '\item ' + m.group(1)),
+
         # Replace single linebreaks with double linebreaks.
         (r'([^\n])\n([^\n])', r'\1\n\n\2'),
 
         # Add header.
         (r'\A',
-r"""\\documentclass[10pt, compress]{beamer}
+r"""
+\\documentclass[10pt, compress]{beamer}
 
 \\usetheme{m}
 
@@ -63,6 +75,8 @@ if __name__ == '__main__':
 
 - Bullet 1
 - Bullet 2
+
+Something else.
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
