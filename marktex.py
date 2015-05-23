@@ -29,6 +29,12 @@ r"""
         # Replace single linebreaks with double linebreaks.
         (r'([^\n])\n([^\n])', r'\1\n\n\2'),
 
+        # *italics*
+        (r'(^|\s)\*(.+?)\*([^\w\d*]|$)', r'\1\\textit{\2}\3'),
+
+        # **bold**
+        (r'(^|\s)\*\*(.+?)\*\*([^\w\d*]|$)', r'\1\\textbf{\2}\3'),
+
         # Add header.
         (r'\A',
 r"""
@@ -76,7 +82,7 @@ if __name__ == '__main__':
 - Bullet 1
 - Bullet 2
 
-Something else.
+And now, for *something* **else**.
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
