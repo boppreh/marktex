@@ -15,16 +15,16 @@ r"""
 \\end{frame}
 """),
 
+        # Add \item to each bullet point.
+        (r'^-\s*([^-\n]+)$', lambda m: '\item ' + m.group(1)),
+
         # Begin and end itemize for bullet points.
-        (r'((?:^-\s*[^-\n]+\n*){2,})',
+        (r'((?:^\\item .+$\n*){2,})',
 r"""
 \\begin{itemize}
 \1
 \\end{itemize}
 """),
-
-        # Add \item to each bullet point.
-        (r'^-\s*([^-\n]+)$', lambda m: '\item ' + m.group(1)),
 
         # Replace single linebreaks with double linebreaks.
         (r'([^\n])\n([^\n])', r'\1\n\n\2'),
