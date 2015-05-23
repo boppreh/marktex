@@ -41,7 +41,9 @@ def generate_pdf(tex_src):
         file.write(tex_src)
     call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
     call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
-    os.remove(tex_location)
+    for temp_file in glob('demo.*'):
+        if temp_file != 'demo.pdf':
+            os.remove(temp_file)
     return os.path.abspath('demo.pdf')
 
 if __name__ == '__main__':
