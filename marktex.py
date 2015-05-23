@@ -16,7 +16,7 @@ r"""
 """),
 
         # Add \item to each bullet point.
-        (r'^-\s*([^-\n]+)$', lambda m: '\item ' + m.group(1)),
+        (r'^-\s*([^-\n]+)$', r'\item \1'),
 
         # Begin and end itemize for bullet points.
         (r'((?:^\\item .+$\n*){2,})',
