@@ -23,6 +23,7 @@ r"""
         # Three dots by themselves on a line make a frame pause.
         (r'^...$', r'\\pause'),
 
+        # Simple images using !(image.jpg) syntax.
         (r'^!\(([^)]+?)\)$',
 r"""
 \\begin{center}
@@ -30,12 +31,8 @@ r"""
 \\end{center}
 """),
 
-        (r'^!(?:\[#\s?([^\]]+)\])?\(([^)]+?)\)$',
-r"""
-\\plain{\1}{\\vspace{-2em}\\begin{center}\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\2}\\end{center}}
-"""),
-
-        (r'^!(?:\[([^\]]+)\])?\(([^)]+?)\)$',
+        # Captioned images using ![caption](image.jpg) syntax.
+        (r'^!(?:\[([^#][^\]]*)\])?\(([^)]+?)\)$',
 r"""
 \\begin{figure}
     \\begin{center}
@@ -43,6 +40,12 @@ r"""
     \\caption{\1}
     \\end{center}
 \\end{figure}
+"""),
+
+        # Plain slide images using ![#caption](image.jpg) syntax.
+        (r'^!(?:\[#\s?([^\]]+)\])?\(([^)]+?)\)$',
+r"""
+\\plain{\1}{\\vspace{-2em}\\begin{center}\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\2}\\end{center}}
 """),
 
         # Add \item to each bullet point.
