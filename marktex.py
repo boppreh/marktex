@@ -45,6 +45,12 @@ r"""
 \\end{center}
 """),
 
+        # Code embedding with !(code.py) syntax.
+        (r'^!\(([^)]+?\.(\w+))\)$',
+r"""
+\inputminted{\2}{\1}
+"""),
+
         # Captioned images using ![caption](image.jpg) syntax.
         (r'^!(?:\[([^#][^\]]*)\])?\(([^)]+?)\)$',
 r"""
@@ -134,6 +140,10 @@ if __name__ == '__main__':
 Aqui vai um pouco de `código`:
 
   Testing
+
+-
+
+!(../marktex.py)
 
 ## Título do slide
 
