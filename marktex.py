@@ -51,8 +51,10 @@ r"""
 \inputminted[fontsize=\small]{\2}{\1}
 """),
 
+        #(r'^!\{([^\}]*)\}\(([^)]+?)\)$',
+
         # Captioned images using ![caption](image.jpg) syntax.
-        (r'^!(?:\[([^#][^\]]*)\])?\(([^)]+?)\)$',
+        (r'^!\[([^#][^\]]*)\]\(([^)]+?)\)$',
 r"""
 \\begin{figure}
 \\begin{center}
@@ -63,7 +65,7 @@ r"""
 """),
 
         # Plain slide images using ![#caption](image.jpg) syntax.
-        (r'^!(?:\[#\s?([^\]]+)\])?\(([^)]+?)\)$',
+        (r'^!\[#\s?([^\]]+)\]\(([^)]+?)\)$',
 r"""
 \\plain{\1}{\\vspace{-2em}\\begin{center}\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\2}\\end{center}}
 """),
