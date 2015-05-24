@@ -1,5 +1,7 @@
 *.swp
 resources/demo.pdf
+resources/images/*
+*.pygtex
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
