@@ -21,7 +21,7 @@ r"""
         # (r'^-+$', r'\\framebreak'),
 
         # Three dots by themselves on a line make a frame pause.
-        (r'^...$', r'\\pause'),
+        (r'^\.{3}$', r'\\pause'),
 
         # Simple images using !(image.jpg) syntax.
         (r'^!\(([^)]+?)\)$',
