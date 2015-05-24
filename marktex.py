@@ -52,7 +52,7 @@ r"""
         (r'^- ?([^-\n]+)$', r'\item \1'),
 
         # Begin and end itemize for bullet points.
-        (r'((?:^\\item [^\n]+$\n*){2,})',
+        (r'((?:^\\item [^\n]+$(?:\\pause|\n)*){2,})',
 r"""
 \\begin{itemize}
 \1
@@ -113,7 +113,9 @@ if __name__ == '__main__':
 ## Título do slide
 
 - Bullet 1
+...
 - Bullet 2
+...
 
 And now, for *something* **else**.
 
