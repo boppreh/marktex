@@ -4,8 +4,8 @@ import os
 from glob import glob
 
 rules = [
-        # Latex hates unescaped underscores.
-        (r'_', r'\_'),
+        # Latex hates unescaped characters.
+        (r'([_$])', r'\\\1'),
 
         # Use # to start sections.
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
