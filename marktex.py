@@ -30,6 +30,16 @@ r"""
 \\end{center}
 """),
 
+        (r'^!(?:\[([^\]]+)\])?\(([^)]+?)\)$',
+r"""
+\\begin{figure}
+    \\begin{center}
+    \\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\2}
+    \\caption{\1}
+    \\end{center}
+\\end{figure}
+"""),
+
         # Add \item to each bullet point.
         (r'^- ?([^-\n]+)$', r'\item \1'),
 
@@ -109,6 +119,11 @@ E mais um slide.
 
 !(images/moodle.png)
 
+## Ibagens Legendárias
+
+Here comes an image:
+
+![Exemplo de figura.](images/moodle.png)
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
