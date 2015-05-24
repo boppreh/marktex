@@ -15,6 +15,14 @@ r"""
 \\end{frame}
 """),
 
+        # Horizontal lines denote frame breaks.
+        # Unfortunately mtheme does not support this, exploding in a "capacity
+        # exceeded" error.
+        # (r'^-+$', r'\\framebreak'),
+
+        # Three dots by themselves on a line make a frame pause.
+        (r'^...$', r'\\pause'),
+
         # Add \item to each bullet point.
         (r'^- ?([^-\n]+)$', r'\item \1'),
 
@@ -83,6 +91,12 @@ if __name__ == '__main__':
 - Bullet 2
 
 And now, for *something* **else**.
+
+## Segundo slide
+
+Aqui tem mais coisa.
+...
+E mais um slide.
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
