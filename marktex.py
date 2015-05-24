@@ -8,7 +8,7 @@ rules = [
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}'),
 
         # Use ## to title slides.
-        (r'^##\s?(.+?)(?:##)?$((?:\n|.)+?)(?=##|\Z)',
+        (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z)',
 r"""
 \\begin{frame}{\1}
 \2
@@ -16,10 +16,10 @@ r"""
 """),
 
         # Add \item to each bullet point.
-        (r'^-\s*([^-\n]+)$', r'\item \1'),
+        (r'^- ?([^-\n]+)$', r'\item \1'),
 
         # Begin and end itemize for bullet points.
-        (r'((?:^\\item .+$\n*){2,})',
+        (r'((?:^\\item [^\n]+$\n*){2,})',
 r"""
 \\begin{itemize}
 \1
@@ -57,7 +57,7 @@ r"""
 
 def apply_rules(rules, src):
     for rule, replacement in rules:
-        src = re.sub(rule, replacement, src, flags=re.MULTILINE)
+        src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
     return src
 
 XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
