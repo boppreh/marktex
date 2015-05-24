@@ -5,23 +5,22 @@ from glob import glob
 
 rules = [
         # Use # to start sections.
-        (r'^#\s?([^#].+?)#?$', r'\\section{\1}'),
+        (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
 
         # Use ## to title slides.
         (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z|!\[#)',
 r"""
-\\begin{frame}{\1}
+\\renewcommand{\\lasttitle}{\1}
+\\begin{frame}{\\lasttitle}
 \2
 \\end{frame}
 """),
 
-        # Horizontal lines denote frame breaks.
-        # Unfortunately mtheme does not support this, exploding in a "capacity
-        # exceeded" error.
-        # (r'^-+$', r'\\framebreak'),
-
         # Three dots by themselves on a line make a frame pause.
         (r'^\.{3}$', r'\\pause'),
+
+        # A horizontal line indicates a frame break.
+        (r'^-+$', r'\\end{frame}\\begin{frame}{\\lasttitle}'),
 
         # Simple images using !(image.jpg) syntax.
         (r'^!\(([^)]+?)\)$',
@@ -81,6 +80,8 @@ r"""
 
 \\usemintedstyle{trac}
 
+\\newcommand{\\lasttitle}{}
+
 \\begin{document}
 """),
 
@@ -122,7 +123,7 @@ And now, for *something* **else**.
 ## Segundo slide
 
 Aqui tem mais coisa.
-...
+-
 E mais um slide.
 
 ## Ibagens
