@@ -8,7 +8,7 @@ rules = [
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}'),
 
         # Use ## to title slides.
-        (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z)',
+        (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z|!\[#)',
 r"""
 \\begin{frame}{\1}
 \2
@@ -28,6 +28,11 @@ r"""
 \\begin{center}
 \\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\1}
 \\end{center}
+"""),
+
+        (r'^!(?:\[#\s?([^\]]+)\])?\(([^)]+?)\)$',
+r"""
+\\plain{\1}{\\vspace{-2em}\\begin{center}\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\2}\\end{center}}
 """),
 
         (r'^!(?:\[([^\]]+)\])?\(([^)]+?)\)$',
@@ -124,6 +129,9 @@ E mais um slide.
 Here comes an image:
 
 ![Exemplo de figura.](images/moodle.png)
+
+
+![#Frame especial para figura](images/moodle.png)
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
