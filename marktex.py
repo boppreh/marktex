@@ -21,7 +21,7 @@ r"""
         # rules, to avoid replacing something incorrectly.
         (r'((?:^  .+?$\n*)+)',
 r"""
-\\begin{minted}{latex}
+\\begin{minted}[fontsize=\small]{latex}
 \1
 \\end{minted}
 """),
@@ -48,7 +48,7 @@ r"""
         # Code embedding with !(code.py) syntax.
         (r'^!\(([^)]+?\.(\w+))\)$',
 r"""
-\inputminted{\2}{\1}
+\inputminted[fontsize=\small]{\2}{\1}
 """),
 
         # Captioned images using ![caption](image.jpg) syntax.
