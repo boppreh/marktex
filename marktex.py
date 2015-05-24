@@ -38,7 +38,7 @@ r"""
 """),
 
         # Simple images using !(image.jpg) syntax.
-        (r'^!\(([^)]+?)\)$',
+        (r'^!\(([^)]+?).(?:jpg|jpeg|gif|png|bmp|pdf|tif)\)$',
 r"""
 \\begin{center}
 \\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\1}
