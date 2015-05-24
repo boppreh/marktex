@@ -37,6 +37,11 @@ r"""
 \\begin{frame}[fragile]{\\lasttitle}
 """),
 
+        # Annotations using {text}(annotation) syntax.
+        # Hackish because we enter math mode needlessly, but I found no other
+        # way.
+        (r'(?<=\W)\{([^\}]*)\}\(([^)]+?)\)(?=\W)', r'$\\underbrace{\\text{\1}}_{\\text{\2}}$'),
+
         # Simple images using !(image.jpg) syntax.
         (r'^!\(([^)]+?\.(?:jpg|jpeg|gif|png|bmp|pdf|tif))\)$',
 r"""
@@ -100,6 +105,7 @@ r"""
 
 \\usetheme{m}
 
+\\usepackage{amsmath}
 \\usepackage{booktabs}
 \\usepackage[scale=2]{ccicons}
 \\usepackage{minted}
@@ -158,7 +164,7 @@ And now, for *something* **else**.
 
 ## Segundo slide
 
-Aqui tem mais coisa.
+Aqui tem mais {coisa}(anotação).
 -
 E mais um slide.
 
