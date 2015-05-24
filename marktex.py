@@ -76,6 +76,9 @@ r"""
         # Replace single linebreaks with double linebreaks.
         (r'([^\n])\n([^\n])', r'\1\n\n\2'),
 
+        # `monospaced`
+        (r'(^|\s)`(.+?)`([^\w\d`]|$)', r'\1\\texttt{\2}\3'),
+
         # *italics*
         (r'(^|\s)\*(.+?)\*([^\w\d*]|$)', r'\1\\textit{\2}\3'),
 
@@ -128,7 +131,7 @@ if __name__ == '__main__':
 
 ## Teste literal
 
-Aqui vai um pouco de código:
+Aqui vai um pouco de `código`:
 
   Testing
 
