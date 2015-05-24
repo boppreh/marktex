@@ -56,8 +56,6 @@ r"""
 \inputminted[fontsize=\small]{\2}{\1}
 """),
 
-        #(r'^!\{([^\}]*)\}\(([^)]+?)\)$',
-
         # Captioned images using ![caption](image.jpg) syntax.
         (r'^!\[([^#][^\]]*)\]\(([^)]+?)\)$',
 r"""
