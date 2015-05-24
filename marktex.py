@@ -74,7 +74,7 @@ r"""
         (r'(?<=\W)\{([^\}]*)\}\(([^)]+?)\)(?=\W)', r'$\\underbrace{\\text{\1}}_{\\text{\2}}$'),
         
         # [Text links](example.org)
-        (r'(?<=\W)\[([^\]]*)\]\(([^)]+?)\)(?=\W)', r'\\href{\2}{\1}'),
+        (r'(?<=\W)\[([^\]]*)\]\(([^)]+?)\)(?=\W)', r'\\href{\2}{\\underline{\1}}'),
 
         # Add \item to each bullet point.
         (r'^- ?([^-\n]+)$', r'\item \1'),
@@ -107,10 +107,12 @@ r"""
 \\usetheme{m}
 
 \\usepackage{amsmath}
-\usepackage{hyperref}
 \\usepackage{booktabs}
 \\usepackage[scale=2]{ccicons}
 \\usepackage{minted}
+
+\\usepackage{hyperref}
+\\hypersetup{colorlinks=true,urlcolor=blue}
 
 \\usemintedstyle{trac}
 
