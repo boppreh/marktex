@@ -10,8 +10,11 @@ rules = [
         # Use # to start sections.
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
 
+        # A ## title without body is rendered as a plain frame.
+        (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|\Z|!\[#)', r'\\plain{}{\1}\2'),
+
         # Use ## to title slides.
-        (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z|!\[#)',
+        (r'^##\s?([^\n]+?)(?:\s?##)?$(.+?)(?=##|\Z|!\[#)',
 r"""
 \\renewcommand{\\lasttitle}{\1}
 \\begin{frame}[fragile]{\\lasttitle}
@@ -28,7 +31,6 @@ r"""
 \1
 \\end{minted}
 """),
-
 
         # Three dots by themselves on a line make a frame pause.
         (r'^\.{3}$', r'\\pause'),
@@ -147,6 +149,7 @@ def generate_pdf(tex_src):
     return os.path.abspath('demo.pdf')
 
 if __name__ == '__main__':
+    # TODO: tables, command line, non-presentation, more templates, better math
     src = """
 # Primeira seção
 
@@ -187,6 +190,9 @@ Aqui tem mais {coisa}(anotação).
 
 
 ![#Frame especial para figura](images/moodle.png)
+
+
+## Questions?
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
