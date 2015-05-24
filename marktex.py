@@ -16,6 +16,9 @@ r"""
 \\end{frame}
 """),
 
+        # Lines starting with two spaces are interpreted as verbatim code.
+        # TODO: remove verbatim code and only reinsert after processing all
+        # rules, to avoid replacing something incorrectly.
         (r'((?:^  .+?$\n*)+)',
 r"""
 \\begin{minted}{latex}
