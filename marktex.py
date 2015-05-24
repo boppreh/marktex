@@ -23,6 +23,13 @@ r"""
         # Three dots by themselves on a line make a frame pause.
         (r'^...$', r'\\pause'),
 
+        (r'^!\(([^)]+?)\)$',
+r"""
+\\begin{center}
+\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\1}
+\\end{center}
+"""),
+
         # Add \item to each bullet point.
         (r'^- ?([^-\n]+)$', r'\item \1'),
 
@@ -97,6 +104,11 @@ And now, for *something* **else**.
 Aqui tem mais coisa.
 ...
 E mais um slide.
+
+## Ibagens
+
+!(images/moodle.png)
+
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
