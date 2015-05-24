@@ -11,16 +11,28 @@ rules = [
         (r'^##\s?(.+?)(?:##)?$(.+?)(?=##|\Z|!\[#)',
 r"""
 \\renewcommand{\\lasttitle}{\1}
-\\begin{frame}{\\lasttitle}
+\\begin{frame}[fragile]{\\lasttitle}
 \2
 \\end{frame}
 """),
+
+        (r'((?:^  .+?$\n*)+)',
+r"""
+\\begin{minted}{latex}
+\1
+\\end{minted}
+"""),
+
 
         # Three dots by themselves on a line make a frame pause.
         (r'^\.{3}$', r'\\pause'),
 
         # A horizontal line indicates a frame break.
-        (r'^-+$', r'\\end{frame}\\begin{frame}{\\lasttitle}'),
+        (r'^-+$',
+r"""
+\\end{frame}
+\\begin{frame}[fragile]{\\lasttitle}
+"""),
 
         # Simple images using !(image.jpg) syntax.
         (r'^!\(([^)]+?)\)$',
@@ -34,10 +46,10 @@ r"""
         (r'^!(?:\[([^#][^\]]*)\])?\(([^)]+?)\)$',
 r"""
 \\begin{figure}
-    \\begin{center}
-    \\includegraphics[width=\\linewidth,height=0.7\\textheight,keepaspectratio]{\2}
-    \\caption{\1}
-    \\end{center}
+\\begin{center}
+\\includegraphics[width=\\linewidth,height=0.7\\textheight,keepaspectratio]{\2}
+\\caption{\1}
+\\end{center}
 \\end{figure}
 """),
 
@@ -110,6 +122,12 @@ def generate_pdf(tex_src):
 if __name__ == '__main__':
     src = """
 # Primeira seção
+
+## Teste literal
+
+Aqui vai um pouco de código:
+
+  Testing
 
 ## Título do slide
 
