@@ -4,6 +4,9 @@ import os
 from glob import glob
 
 rules = [
+        # Latex hates unescaped underscores.
+        (r'_', r'\_'),
+
         # Use # to start sections.
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
 
@@ -152,6 +155,8 @@ if __name__ == '__main__':
 Aqui vai um pouco de `código`:
 
   Testing
+
+`if __name__ == '__main__':`
 
 -
 
