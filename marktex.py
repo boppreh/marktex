@@ -3,6 +3,38 @@ from subprocess import call, Popen
 import os
 from glob import glob
 
+def convert_table(match):
+    text = match.group(1)
+    # Remove starting |
+    text = re.sub(r'(^|\n)\|\s*', r'\1', text)
+    # Remove trailing | and replace with \\
+    text = re.sub(r'\s*\|(\n|$)', r' \\\\\1', text)
+    # Use remaining |'s to align values.
+    text = re.sub('\s*\|\s*', ' & ', text)
+    lines = text.split('\n')
+    headers, alignment, *content = lines
+    # Center alignment.
+    alignment = re.sub(':-+: ', 'c', alignment)
+    # Left alignment.
+    alignment = re.sub('-+: ', 'l', alignment)
+    # Right alignment.
+    alignment = re.sub(':-+ ', 'r', alignment)
+    # Remove everything that was left in the alignment string.
+    alignment = re.sub('[^lcr ]', '', alignment)
+    # Put everything together, remembering to escape curly braces because they
+    # are used in Python's format.
+    return """
+\\begin{{table}}
+\\begin{{tabular}}{{{1}}}
+\\toprule
+{0}
+\\midrule
+{2}
+\\bottomrule
+\\end{{tabular}}
+\\end{{table}}
+""".format(headers, alignment, '\n'.join(content))
+
 rules = [
         # Latex hates unescaped characters.
         (r'([_$])', r'\\\1'),
@@ -21,6 +53,15 @@ r"""
 \2
 \\end{frame}
 """),
+
+        # Tables as such:
+        #
+        # | Header 1 | Header 2 | Header 3 |
+        # |---------:|:--------:|:---------|
+        # | Value    |   Value  |    Value |
+        # | Value    |   Value  |    Value |
+        # | Value    |   Value  |    Value |
+        (r'(?<=\n\n)((?:^\|.+?\|\n)+)', convert_table),
 
         # Lines starting with two spaces are interpreted as verbatim code.
         # TODO: remove verbatim code and only reinsert after processing all
@@ -191,8 +232,15 @@ Aqui tem mais {coisa}(anotação).
 
 ![#Frame especial para figura](images/moodle.png)
 
-
 ## Questions?
+
+## Tableas!
+
+| Tables        | Are           | Cool  |
+|:-------------:|--------------:|:------|
+| col 3 is      |    r-l        | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
 """
     tex_src = apply_rules(rules, src)
     print(tex_src)
