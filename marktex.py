@@ -36,9 +36,6 @@ def convert_table(match):
 """.format(headers, alignment, '\n'.join(content))
 
 rules = [
-        # Latex hates unescaped characters.
-        (r'([_$])', r'\\\1'),
-
         # Use # to start sections.
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
 
@@ -53,6 +50,9 @@ r"""
 \2
 \\end{frame}
 """),
+
+        # Latex hates unescaped characters.
+        (r'([_$#])', r'\\\1'),
 
         # Tables as such:
         #
