@@ -120,6 +120,13 @@ def include_math(match):
         return '$' + text + '$'
 
 rules = [
+        (r'\A\s*([^#]+)',
+r"""
+\\begin{frame}{}
+\1
+\\end{frame}
+"""),
+
         # A ## title without body is rendered as a plain frame.
         (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|!\[#|\Z)', r'\\plain{}{\1}\2'),
 
@@ -285,8 +292,8 @@ if __name__ == '__main__':
     from sys import argv, stdin
     if len(argv) <= 1:
         src = stdin.buffer.read().decode('utf-8')
-        #src = '## Title\n$$1 + (2 * 3 / log_2 4)\n3*10^5$$'
-        #print(apply_rules(rules, src))
+        #src = '$$1 + (2 * 3 / log_2 4)\n3*10^5$$'
+        print(apply_rules(rules, src))
         run(src, 'marktex.pdf')
         Popen([OPEN_COMMAND.format('marktex.pdf')], shell=True)
     elif len(argv) >= 2:
