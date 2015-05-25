@@ -43,7 +43,7 @@ rules = [
         (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|\Z|!\[#)', r'\\plain{}{\1}\2'),
 
         # Use ## to title slides.
-        (r'^##\s?([^\n]+?)(?:\s?##)?$(.+?)(?=##|\Z|!\[#)',
+        (r'^##\s?([^\n]+?)(?:\s?##)?$(.+?)(?=^##|\Z|^!\[#|^\\plain)',
 r"""
 \\renewcommand{\\lasttitle}{\1}
 \\begin{frame}[fragile]{\\lasttitle}
