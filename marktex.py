@@ -136,8 +136,8 @@ r"""
 
 \\usepackage{amsmath}
 \\usepackage{booktabs}
-\\usepackage[scale=2]{ccicons}
 \\usepackage{minted}
+\\usepackage{listings}
 
 \\usepackage{hyperref}
 \\hypersetup{colorlinks=true,urlcolor=blue}
@@ -172,17 +172,22 @@ def apply_rules(rules, src):
 
     def reinsert_verbatim(match):
         v = verbatims[int(match.group(1))]
+        v = v.replace('{', r'\{')
+        v = v.replace('}', r'\}')
         if '\n' in v:
             return r"""\begin{{minted}}[fontsize=\small]{{latex}}
 {}
 \end{{minted}}""".format(verbatims.pop())
         else:
-            return '\\mintinline{{latex}}{{{}}}'.format(v.strip('`'))
+            return '\\texttt{{\\lstinline{{{}}}}}'.format(v.strip('`'))
     src = re.sub(verbatim_replacement + r'(\d+)!', reinsert_verbatim, src)
 
     return src
 
-XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
+#XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
+#OPEN_COMMAND = r'start "{}"'
+XELATEX_LOCATION = r"xelatex"
+OPEN_COMMAND = r'xdg-open "{}"'
 
 def generate_pdf(tex_src):
     os.chdir(os.path.join(os.path.dirname(__file__), 'resources'))
@@ -201,7 +206,8 @@ if __name__ == '__main__':
     # TODO: command line, non-presentation, more templates, better math
     tex_src = apply_rules(rules, open('resources/example.md').read())
     print(tex_src)
-    Popen(['start', generate_pdf(tex_src)], shell=True)
+    print(OPEN_COMMAND.format(generate_pdf(tex_src)))
+    os.system(OPEN_COMMAND.format(generate_pdf(tex_src)))
 
     exit()
     from sys import argv
