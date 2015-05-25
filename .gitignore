@@ -1,4 +1,5 @@
 *.swp
+*.swo
 resources/demo.pdf
 resources/images/*
 *.pygtex
