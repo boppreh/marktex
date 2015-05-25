@@ -21,7 +21,7 @@
 ## And tables!
 
 | Who        | Got tables? | Has to deal with Latex? | Can align? |
-|-----------:|:-----------:|:------------------------|-----------:|
+|-----------:|:-----------:|:-----------------------:|-----------:|
 | Me         | Yes         | No                      | Sure       |
 | You!       | Yes!        | *No!*                   | Of course  |
 | Everyone!! | Yes!!       | **No!!**                | Naturally  |
