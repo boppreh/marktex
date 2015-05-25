@@ -36,14 +36,8 @@ def convert_table(match):
 """.format(headers, alignment, '\n'.join(content))
 
 rules = [
-        # Use # to start sections.
-        (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
-
-        # A ## title without body is rendered as a plain frame.
-        (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|\Z|!\[#)', r'\\plain{}{\1}\2'),
-
         # Use ## to title slides.
-        (r'^##\s?([^\n]+?)(?:\s?##)?$(.+?)(?=^##|\Z|^!\[#|^\\plain)',
+        (r'^##\s?([^\n]+?)(?:\s?##)?$(.+?)(?=^#|\Z|^!\[#|^\\plain)',
 r"""
 \\renewcommand{\\lasttitle}{\1}
 \\begin{frame}[fragile]{\\lasttitle}
@@ -51,8 +45,20 @@ r"""
 \\end{frame}
 """),
 
+        # Use # to start sections.
+        (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
+
+        # A ## title without body is rendered as a plain frame.
+        (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|\Z|!\[#)', r'\\plain{}{\1}\2'),
+
         # Latex hates unescaped characters.
-        (r'([_$#])', r'\\\1'),
+        (r'([$#])', r'\\\1'),
+
+        # Annotations using {text}(annotation) syntax.
+        # Hackish because we enter math mode needlessly, but I found no other
+        # way.
+        (r'\{([^\n]+?)\}\(([^\n]+?)\)', r'$\\underbrace{\\text{\1}}_{\\text{\2}}$'),
+
 
         # Tables as such:
         #
@@ -84,11 +90,11 @@ r"""
         # Code embedding with !(code.py) syntax.
         (r'^!\(([^)]+?\.(\w+))\)$',
 r"""
-\inputminted[fontsize=\small]{\2}{\1}
+\inputminted[fontsize=\small]{latex}{\1}
 """),
 
         # Captioned images using ![caption](image.jpg) syntax.
-        (r'^!\[([^#][^\]]*)\]\(([^)]+?)\)$',
+        (r'^!\[([^\]]+?)\]\(([^)]+?)\)$',
 r"""
 \\begin{figure}
 \\begin{center}
@@ -97,23 +103,12 @@ r"""
 \\end{center}
 \\end{figure}
 """),
-
-        # Plain slide images using ![#caption](image.jpg) syntax.
-        (r'^!\[#\s?([^\]]+)\]\(([^)]+?)\)$',
-r"""
-\\plain{\1}{\\vspace{-2em}\\begin{center}\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\2}\\end{center}}
-"""),
-
-        # Annotations using {text}(annotation) syntax.
-        # Hackish because we enter math mode needlessly, but I found no other
-        # way.
-        (r'(?<=\W)\{([^\}]*)\}\(([^)]+?)\)(?=\W)', r'$\\underbrace{\\text{\1}}_{\\text{\2}}$'),
         
         # [Text links](example.org)
         (r'(?<=\W)\[([^\]]*)\]\(([^)]+?)\)(?=\W)', r'\\href{\2}{\\underline{\1}}'),
 
         # Add \item to each bullet point.
-        (r'^- ?([^-\n]+)$', r'\item \1'),
+        (r'^- ?([^-][^\n]*)$', r'\item \1'),
 
         # Begin and end itemize for bullet points.
         (r'((?:^\\item [^\n]+$(?:\\pause|\n)*){2,})',
@@ -125,9 +120,6 @@ r"""
 
         # Replace single linebreaks with double linebreaks.
         (r'([^\n])\n([^\n])', r'\1\n\n\2'),
-
-        # `monospaced`
-        (r'(^|\s)`(.+?)`([^\w\d`]|$)', r'\1\\texttt{\2}\3'),
 
         # **bold**
         (r'(^|\s)\*\*(.+?)\*\*([^\w\d*]|$)', r'\1\\textbf{\2}\3'),
@@ -162,24 +154,32 @@ r"""
 ]
 
 def apply_rules(rules, src):
+    # To avoid processing what should be verbatim (`` and two-spaces indented)
+    # we remove all verbatim code, replacing with a unique value, and reinsert
+    # after all rules are done.
     from uuid import uuid4
     verbatim_replacement = str(uuid4())
     verbatims = []
+
     def remove_verbatim(match):
+        n = len(verbatims)
         verbatims.append(match.group(1))
-        return verbatim_replacement
-
-    def reinsert_verbatim(match):
-        return r"""\begin{{minted}}[fontsize=\small]{{latex}}
-{}
-\end{{minted}}""".format(verbatims.pop())
-
-    src = re.sub(r'((?:\n  .+)+)', remove_verbatim, src, re.MULTILINE)
+        return verbatim_replacement + str(n) + '!'
+    src = re.sub(r'((?:\n  .+)+|`.*?[^\\]`)', remove_verbatim, src, re.MULTILINE)
 
     for rule, replacement in rules:
         src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
 
-    src = re.sub(verbatim_replacement, reinsert_verbatim, src)
+    def reinsert_verbatim(match):
+        v = verbatims[int(match.group(1))]
+        if '\n' in v:
+            return r"""\begin{{minted}}[fontsize=\small]{{latex}}
+{}
+\end{{minted}}""".format(verbatims.pop())
+        else:
+            return '\\mintinline{{latex}}{{{}}}'.format(v.strip('`'))
+    src = re.sub(verbatim_replacement + r'(\d+)!', reinsert_verbatim, src)
+
     return src
 
 XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
@@ -190,6 +190,8 @@ def generate_pdf(tex_src):
     with open(tex_location, 'w', encoding='utf-8') as file:
         file.write(tex_src)
     call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
+    # Without a second call some section titles get unaligned.
+    call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
     for temp_file in glob('demo.*'):
         if temp_file != 'demo.pdf':
             os.remove(temp_file)
@@ -197,60 +199,10 @@ def generate_pdf(tex_src):
 
 if __name__ == '__main__':
     # TODO: command line, non-presentation, more templates, better math
-    src = """
-# Primeira seção
-
-## Teste literal
-
-Aqui vai um pouco de `código`:
-
-  Testing
-
-`if __name__ == '__main__':`
-
--
-
-!(../marktex.py)
-
-## Título do slide
-
-- Bullet 1
-...
-- Bullet 2
-...
-
-And now, for *something* **else**.
-
-## Segundo slide
-
-Aqui tem mais {coisa}(anotação).
--
-[E mais um slide](example.org).
-
-## Ibagens
-
-!(images/moodle.png)
-
-## Ibagens Legendárias
-
-![Exemplo de figura.](images/moodle.png)
-
-
-![#Frame especial para figura](images/moodle.png)
-
-## Questions?
-
-## Tableas!
-
-| Tables        | Are           | Cool  |
-|:-------------:|--------------:|:------|
-| col 3 is      |    r-l        | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-"""
-    tex_src = apply_rules(rules, src)
+    tex_src = apply_rules(rules, open('resources/example.md').read())
     print(tex_src)
     Popen(['start', generate_pdf(tex_src)], shell=True)
+
     exit()
     from sys import argv
     if len(argv) <= 1:
