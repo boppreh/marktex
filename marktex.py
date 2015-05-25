@@ -105,6 +105,9 @@ def include_image(match):
 """.format(path, match.groups(1))
 
 rules = [
+        # A ## title without body is rendered as a plain frame.
+        (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|!\[#|\Z)', r'\\plain{}{\1}\2'),
+
         # Use ## to title slides.
         (r'^##\s?([^\n]+?)(?:\s?##)?$(.+?)(?=^#|\Z|^!\[#|^\\plain)',
 r"""
@@ -116,9 +119,6 @@ r"""
 
         # Use # to start sections.
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
-
-        # A ## title without body is rendered as a plain frame.
-        (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|\Z|!\[#)', r'\\plain{}{\1}\2'),
 
         # Latex hates unescaped characters.
         (r'([$#%])', r'\\\1'),
