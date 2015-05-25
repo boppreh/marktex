@@ -104,6 +104,16 @@ def include_image(match):
 \end{{figure}}
 """.format(path, match.groups(1))
 
+def include_math(match):
+    text = match.group(1)
+    text = text.replace('(', '\\left(')
+    text = text.replace(')', '\\right)')
+    text = text.replace('[', '\\left[')
+    text = text.replace(']', '\\right]')
+    text = text.replace('/', '\\over')
+    text = re.sub(r'[^a-zA-Z]log[^a-zA-Z]', r'\\log', text)
+    return '$' + text + '$'
+
 rules = [
         # A ## title without body is rendered as a plain frame.
         (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|!\[#|\Z)', r'\\plain{}{\1}\2'),
@@ -123,13 +133,13 @@ r"""
         # Latex hates unescaped characters.
         (r'([$#%])', r'\\\1'),
 
-        # Two dollars start math mode.
-        (r'\$\$', r'$'),
-
         # Annotations using {text}(annotation) syntax.
         # Hackish because we enter math mode needlessly, but I found no other
         # way.
         (r'\{([^\n]+?)\}\(([^\n]+?)\)', r'$\\underbrace{\\text{\1}}_{\\text{\2}}$'),
+
+        # Two dollars start math mode.
+        (r'\\\$\\\$([^$\n]+?)\\\$\\\$', include_math),
 
 
         # Tables as such:
@@ -269,7 +279,9 @@ if __name__ == '__main__':
     # TODO: non-presentation, more templates, better math
     from sys import argv, stdin
     if len(argv) <= 1:
-        run(stdin.buffer.read().decode('utf-8'), 'marktex.pdf')
+        #src = stdin.buffer.read().decode('utf-8')
+        src = '## Title\n$$1 + (2 * 3 / log 4)$$'
+        run(src, 'marktex.pdf')
         Popen([OPEN_COMMAND.format('marktex.pdf')], shell=True)
     elif len(argv) >= 2:
         for file_path in argv[1:]:
