@@ -1,3 +1,4 @@
+#! /bin/env python3
 import re
 from subprocess import call, Popen
 import os
@@ -34,6 +35,66 @@ def convert_table(match):
 \\end{{tabular}}
 \\end{{table}}
 """.format(headers, alignment, '\n'.join(content))
+
+languages = """
+cucumber 	abap 	ada 	ahk
+antlr 	apacheconf 	applescript 	as
+aspectj 	autoit 	asy 	awk
+basemake 	bash 	bat 	bbcode
+befunge 	bmax 	boo 	brainfuck
+bro 	bugs 	c 	ceylon
+cfm 	cfs 	cheetah 	clj
+cmake 	cobol 	cl 	console
+control 	coq 	cpp 	croc
+csharp 	css 	cuda 	cyx
+d 	dg 	diff 	django
+dpatch 	duel 	dylan 	ec
+erb 	evoque 	fan 	fancy
+fortran 	gas 	genshi 	glsl
+gnuplot 	go 	gosu 	groovy
+gst 	haml 	haskell 	hxml
+html 	http 	hx 	idl
+irc 	ini 	java 	jade
+js 	json 	jsp 	kconfig
+koka 	lasso 	livescrit 	llvm
+logos 	lua 	mako 	mason
+matlab 	minid 	monkey 	moon
+mxml 	myghty 	mysql 	nasm
+newlisp 	newspeak 	numpy 	ocaml
+octave 	ooc 	perl 	php
+plpgsql 	postgresql 	postscript 	pot
+prolog 	psql 	puppet 	python
+qml 	ragel 	raw 	ruby
+rhtml 	sass 	scheme 	smalltalk
+sql 	ssp 	tcl 	tea
+tex 	text 	vala 	vgl
+vim 	xml 	xquery 	yaml 
+""".split()
+
+def include_source(match):
+    language = match.groups(2)
+    if language not in languages:
+        language = 'latex'
+    path = os.path.abspath(match.group(1))
+    return r'\inputminted[fontsize=\small]{{{}}}{{{}}}'.format(language, path)
+
+def include_image(match):
+    path = os.path.abspath(match.groups()[-1])
+    if len(match.groups()) == 1:
+        return r"""
+\begin{{center}}
+\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{{{}}}
+\end{{center}}
+""".format(path)
+    else:
+        return r"""
+\begin{{figure}}
+\begin{{center}}
+\includegraphics[width=\linewidth,height=0.7\textheight,keepaspectratio]{{{}}}
+\caption{{{}}}
+\end{{center}}
+\end{{figure}}
+""".format(path, match.groups(1))
 
 rules = [
         # Use ## to title slides.
@@ -80,29 +141,13 @@ r"""
 """),
 
         # Simple images using !(image.jpg) syntax.
-        (r'^!\(([^)]+?\.(?:jpg|jpeg|gif|png|bmp|pdf|tif))\)$',
-r"""
-\\begin{center}
-\\includegraphics[width=\\linewidth,height=0.8\\textheight,keepaspectratio]{\1}
-\\end{center}
-"""),
+        (r'^!\(([^)]+?\.(?:jpg|jpeg|gif|png|bmp|pdf|tif))\)$', include_image),
 
         # Code embedding with !(code.py) syntax.
-        (r'^!\(([^)]+?\.(\w+))\)$',
-r"""
-\inputminted[fontsize=\small]{latex}{\1}
-"""),
+        (r'^!\(([^)]+?\.(\w+))\)$', include_source),
 
         # Captioned images using ![caption](image.jpg) syntax.
-        (r'^!\[([^\]]+?)\]\(([^)]+?)\)$',
-r"""
-\\begin{figure}
-\\begin{center}
-\\includegraphics[width=\\linewidth,height=0.7\\textheight,keepaspectratio]{\2}
-\\caption{\1}
-\\end{center}
-\\end{figure}
-"""),
+        (r'^!\[([^\]]+?)\]\(([^)]+?)\)$', include_image),
         
         # [Text links](example.org)
         (r'(?<=\W)\[([^\]]*)\]\(([^)]+?)\)(?=\W)', r'\\href{\2}{\\underline{\1}}'),
@@ -190,30 +235,38 @@ XELATEX_LOCATION = r"xelatex"
 OPEN_COMMAND = r'xdg-open "{}"'
 
 def generate_pdf(tex_src):
+    old_dir = os.getcwd()
     os.chdir(os.path.join(os.path.dirname(__file__), 'resources'))
+
     tex_location = 'demo.tex'
     with open(tex_location, 'w', encoding='utf-8') as file:
         file.write(tex_src)
+
     call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
     # Without a second call some section titles get unaligned.
     call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_location])
+
     for temp_file in glob('demo.*'):
         if temp_file != 'demo.pdf':
             os.remove(temp_file)
-    return os.path.abspath('demo.pdf')
+
+    pdf_location = os.path.abspath('demo.pdf')
+    os.chdir(old_dir)
+    return pdf_location
+
+def run(src, outfile):
+    tex_src = apply_rules(rules, src)
+    pdf_location = generate_pdf(tex_src)
+    print(outfile)
+    os.rename(pdf_location, outfile)
 
 if __name__ == '__main__':
-    # TODO: command line, non-presentation, more templates, better math
-    tex_src = apply_rules(rules, open('resources/example.md').read())
-    print(tex_src)
-    print(OPEN_COMMAND.format(generate_pdf(tex_src)))
-    os.system(OPEN_COMMAND.format(generate_pdf(tex_src)))
-
-    exit()
-    from sys import argv
+    # TODO: non-presentation, more templates, better math
+    from sys import argv, stdin
     if len(argv) <= 1:
-        pass
-    elif len(argv) == 2:
-        pass
-    elif len(argv) == 3:
-        pass
+        run(stdin.buffer.read().decode('utf-8'), 'marktex.pdf')
+    elif len(argv) >= 2:
+        for file_path in argv[1:]:
+            contents = open(file_path).read()
+            out_path = re.sub(r'\.\w+$', '.pdf', file_path)
+            run(contents, out_path)
