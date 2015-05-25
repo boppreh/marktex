@@ -4,6 +4,14 @@ from subprocess import call, Popen
 import os
 from glob import glob
 
+import platform
+if platform.system() == 'Windows':
+    XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
+    OPEN_COMMAND = r'start "{}"'
+else:
+    XELATEX_LOCATION = r"xelatex"
+    OPEN_COMMAND = r'xdg-open "{}"'
+
 def convert_table(match):
     text = match.group(1)
     # Remove starting |
@@ -229,11 +237,6 @@ def apply_rules(rules, src):
 
     return src
 
-#XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
-#OPEN_COMMAND = r'start "{}"'
-XELATEX_LOCATION = r"xelatex"
-OPEN_COMMAND = r'xdg-open "{}"'
-
 def generate_pdf(tex_src):
     old_dir = os.getcwd()
     os.chdir(os.path.join(os.path.dirname(__file__), 'resources'))
@@ -257,7 +260,6 @@ def generate_pdf(tex_src):
 def run(src, outfile):
     tex_src = apply_rules(rules, src)
     pdf_location = generate_pdf(tex_src)
-    print(outfile)
     os.rename(pdf_location, outfile)
 
 if __name__ == '__main__':
@@ -265,6 +267,7 @@ if __name__ == '__main__':
     from sys import argv, stdin
     if len(argv) <= 1:
         run(stdin.buffer.read().decode('utf-8'), 'marktex.pdf')
+        Popen([OPEN_COMMAND.format('marktex.pdf')], shell=True)
     elif len(argv) >= 2:
         for file_path in argv[1:]:
             contents = open(file_path).read()
