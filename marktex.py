@@ -196,7 +196,7 @@ def generate_pdf(tex_src):
     return os.path.abspath('demo.pdf')
 
 if __name__ == '__main__':
-    # TODO: tables, command line, non-presentation, more templates, better math
+    # TODO: command line, non-presentation, more templates, better math
     src = """
 # Primeira seção
 
