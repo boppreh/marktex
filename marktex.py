@@ -15,10 +15,10 @@ def convert_table(match):
     headers, alignment, *content = lines
     # Center alignment.
     alignment = re.sub(':-+: ', 'c', alignment)
-    # Left alignment.
-    alignment = re.sub('-+: ', 'l', alignment)
     # Right alignment.
     alignment = re.sub(':-+ ', 'r', alignment)
+    # Left alignment.
+    alignment = re.sub('-+:? ', 'l', alignment)
     # Remove everything that was left in the alignment string.
     alignment = re.sub('[^lcr ]', '', alignment)
     # Put everything together, remembering to escape curly braces because they
