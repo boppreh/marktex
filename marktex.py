@@ -52,7 +52,7 @@ r"""
         (r'^##\s?([^\n]+?)(?:\s?##)?$(\s*)(?=##|\Z|!\[#)', r'\\plain{}{\1}\2'),
 
         # Latex hates unescaped characters.
-        (r'([$#])', r'\\\1'),
+        (r'([$#%])', r'\\\1'),
 
         # Annotations using {text}(annotation) syntax.
         # Hackish because we enter math mode needlessly, but I found no other
