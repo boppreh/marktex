@@ -69,10 +69,10 @@ rhtml 	sass 	scheme 	smalltalk
 sql 	ssp 	tcl 	tea
 tex 	text 	vala 	vgl
 vim 	xml 	xquery 	yaml 
-""".split()
+"""
 
 def include_source(match):
-    language = match.groups(2)
+    language = match.group(2)
     if language not in languages:
         language = 'latex'
     path = os.path.abspath(match.group(1))
