@@ -63,16 +63,6 @@ r"""
         # | Value    |   Value  |    Value |
         (r'(?<=\n\n)((?:^\|.+?\|\n)+)', convert_table),
 
-        # Lines starting with two spaces are interpreted as verbatim code.
-        # TODO: remove verbatim code and only reinsert after processing all
-        # rules, to avoid replacing something incorrectly.
-        (r'((?:^  .+?$\n*)+)',
-r"""
-\\begin{minted}[fontsize=\small]{latex}
-\1
-\\end{minted}
-"""),
-
         # Three dots by themselves on a line make a frame pause.
         (r'^\.{3}$', r'\\pause'),
 
@@ -172,8 +162,24 @@ r"""
 ]
 
 def apply_rules(rules, src):
+    from uuid import uuid4
+    verbatim_replacement = str(uuid4())
+    verbatims = []
+    def remove_verbatim(match):
+        verbatims.append(match.group(1))
+        return verbatim_replacement
+
+    def reinsert_verbatim(match):
+        return r"""\begin{{minted}}[fontsize=\small]{{latex}}
+{}
+\end{{minted}}""".format(verbatims.pop())
+
+    src = re.sub(r'((?:\n  .+)+)', remove_verbatim, src, re.MULTILINE)
+
     for rule, replacement in rules:
         src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
+
+    src = re.sub(verbatim_replacement, reinsert_verbatim, src)
     return src
 
 XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
