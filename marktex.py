@@ -123,6 +123,9 @@ r"""
         # Latex hates unescaped characters.
         (r'([$#%])', r'\\\1'),
 
+        # Two dollars start math mode.
+        (r'\$\$', r'$'),
+
         # Annotations using {text}(annotation) syntax.
         # Hackish because we enter math mode needlessly, but I found no other
         # way.
