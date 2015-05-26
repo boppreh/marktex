@@ -232,6 +232,12 @@ r"""
 ]
 
 def apply_rules(rules, src):
+    # If the user uses section titles, but not slide titles, the slides will
+    # look weird. So it's best if we use the section slides as slide titles.
+    if not re.search(r'^## ', src, re.MULTILINE):
+        src = re.sub(r'^#', r'##', src, re.MULTILINE)
+        pass
+
     # To avoid processing what should be verbatim (`` and two-spaces indented)
     # we remove all verbatim code, replacing with a unique value, and reinsert
     # after all rules are done.
