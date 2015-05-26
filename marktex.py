@@ -234,8 +234,8 @@ r"""
 def apply_rules(rules, src):
     # If the user uses section titles, but not slide titles, the slides will
     # look weird. So it's best if we use the section slides as slide titles.
-    if not re.search(r'^## ', src, re.MULTILINE):
-        src = re.sub(r'^#', r'##', src, re.MULTILINE)
+    if not re.search(r'^## ', src, flags=re.MULTILINE):
+        src = re.sub(r'^#', r'##', src, flags=re.MULTILINE)
         pass
 
     # To avoid processing what should be verbatim (`` and two-spaces indented)
@@ -249,7 +249,7 @@ def apply_rules(rules, src):
         n = len(verbatims)
         verbatims.append(match.group(1))
         return verbatim_replacement + str(n) + '!'
-    src = re.sub(r'((?:\n  .+)+|`.*?[^\\]`)', remove_verbatim, src, re.MULTILINE)
+    src = re.sub(r'((?:^\s\s.*\n)+|`.*?[^\\]`)', remove_verbatim, src, flags=re.MULTILINE)
 
     for rule, replacement in rules:
         src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
