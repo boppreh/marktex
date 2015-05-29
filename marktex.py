@@ -16,10 +16,15 @@ def compile_src(marktex_src, template='presentation'):
     return pdf_path
 
 def compile_file(marktex_file, template='presentation'):
+    """
+    Compiles the Marktex file at the given location to a similarly named PDF.
+    """
     with open(marktex_file) as file:
         marktex_src = file.read()
         tex_src = templates[template](marktex_src)
-        return generate_pdf(tex_src, re.sub(r'\.\w+$', '.pdf', marktex_file))
+        pdf_path = re.sub(r'\.\w+$', '.pdf', marktex_file)
+        generate_pdf(tex_src, pdf_path)
+    return pdf_path
 
 if __name__ == '__main__':
     #start(compile_file('example.md')); exit()
