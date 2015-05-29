@@ -297,12 +297,9 @@ def generate_pdf(tex_src):
     os.chdir(old_dir)
     return pdf_location
 
-def run(src, outfile):
-    tex_src = translate_presentation(src)
-    pdf_location = generate_pdf(tex_src)
-    os.rename(pdf_location, outfile)
-
 if __name__ == '__main__':
+    Popen([OPEN_COMMAND.format(generate_pdf(translate_presentation(open('example.md').read())))], shell=True)
+    exit()
     from sys import argv, stdin
     if len(argv) <= 1:
         src = stdin.buffer.read().decode('utf-8')
@@ -314,4 +311,5 @@ if __name__ == '__main__':
         for file_path in argv[1:]:
             contents = open(file_path).read()
             out_path = re.sub(r'\.\w+$', '.pdf', file_path)
-            run(contents, out_path)
+            tex_src = translate_presentation(src)
+            os.rename(generate_pdf(tex_src), out_path)
