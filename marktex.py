@@ -119,7 +119,7 @@ def include_math(match):
     else:
         return '$' + text + '$'
 
-rules = [
+presentation_rules = [
         (r'\A\s*([^#]+)',
 r"""
 \\begin{frame}{}
@@ -142,6 +142,19 @@ r"""
         # Use # to start sections.
         (r'^#\s?([^#].+?)#?$', r'\\section{\1}\\renewcommand{\\lasttitle}{\1}'),
 
+
+        # Three dots by themselves on a line make a frame pause.
+        (r'^\.{3}$', r'\\pause'),
+
+        # A horizontal line indicates a frame break.
+        (r'^-+$',
+r"""
+\\end{frame}
+\\begin{frame}[fragile]{\\lasttitle}
+"""),
+]
+
+generic_rules = [
         # Latex hates unescaped characters.
         (r'([$#%])', r'\\\1'),
 
@@ -162,16 +175,6 @@ r"""
         # | Value    |   Value  |    Value |
         # | Value    |   Value  |    Value |
         (r'(?<=\n\n)((?:^\|.+?\|\n)+)', convert_table),
-
-        # Three dots by themselves on a line make a frame pause.
-        (r'^\.{3}$', r'\\pause'),
-
-        # A horizontal line indicates a frame break.
-        (r'^-+$',
-r"""
-\\end{frame}
-\\begin{frame}[fragile]{\\lasttitle}
-"""),
 
         # Simple images using !(image.jpg) syntax.
         (r'^!\(([^)]+?\.(?:jpg|jpeg|gif|png|bmp|pdf|tif))\)$', include_image),
@@ -204,34 +207,15 @@ r"""
 
         # *italics*
         (r'(^|\s)\*(.+?)\*([^\w\d*]|$)', r'\1\\textit{\2}\3'),
-
-        # Add header.
-        (r'\A',
-r"""
-\\documentclass[10pt, compress]{beamer}
-
-\\usetheme{m}
-
-\\usepackage{amsmath}
-\\usepackage{booktabs}
-\\usepackage{minted}
-\\usepackage{listings}
-
-\\usepackage{hyperref}
-\\hypersetup{colorlinks=true,urlcolor=blue}
-
-\\usemintedstyle{trac}
-
-\\newcommand{\\lasttitle}{}
-
-\\begin{document}
-"""),
-
-        # Add footer.
-        (r'\Z', r'\\end{document}'),
 ]
 
-def apply_rules(rules, src):
+def apply(rules_list, src):
+    for rules in rules_list:
+        for rule, replacement in rules:
+            src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
+    return src
+
+def apply_rules(src):
     # If the user uses section titles, but not slide titles, the slides will
     # look weird. So it's best if we use the section slides as slide titles.
     if not re.search(r'^## ', src, flags=re.MULTILINE):
@@ -251,8 +235,7 @@ def apply_rules(rules, src):
         return verbatim_replacement + str(n) + '!'
     src = re.sub(r'((?:^\s\s.*\n)+|`.*?[^\\]`)', remove_verbatim, src, flags=re.MULTILINE)
 
-    for rule, replacement in rules:
-        src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
+    src = apply([presentation_rules, generic_rules], src)
 
     def reinsert_verbatim(match):
         v = verbatims[int(match.group(1))]
@@ -266,9 +249,32 @@ def apply_rules(rules, src):
             return '\\texttt{{\\lstinline{{{}}}}}'.format(v.strip('`'))
     src = re.sub(verbatim_replacement + r'(\d+)!', reinsert_verbatim, src)
 
-    return src
+    header = r"""
+\documentclass[10pt, compress]{beamer}
 
-def generate_pdf(tex_src):
+\usetheme{m}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{minted}
+\usepackage{listings}
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+
+\usemintedstyle{trac}
+
+\newcommand{\lasttitle}{}
+
+\begin{document}
+"""
+
+    footer = r'\end{document}'
+
+
+    return header + src + footer
+
+def translate_presentation(tex_src):
     old_dir = os.getcwd()
     os.chdir(os.path.join(os.path.dirname(__file__), 'resources'))
 
@@ -289,17 +295,16 @@ def generate_pdf(tex_src):
     return pdf_location
 
 def run(src, outfile):
-    tex_src = apply_rules(rules, src)
-    pdf_location = generate_pdf(tex_src)
+    tex_src = apply_rules(src)
+    pdf_location = translate_presentation(tex_src)
     os.rename(pdf_location, outfile)
 
 if __name__ == '__main__':
-    # TODO: non-presentation, more templates, better math
     from sys import argv, stdin
     if len(argv) <= 1:
         src = stdin.buffer.read().decode('utf-8')
-        #src = '$$1 + (2 * 3 / log_2 4)\n3*10^5$$'
-        print(apply_rules(rules, src))
+        #src = '$$1 + 1 / 1 + 1\n1 * 1 / 1 * 1$$'
+        print(apply_rules(src))
         run(src, 'marktex.pdf')
         Popen([OPEN_COMMAND.format('marktex.pdf')], shell=True)
     elif len(argv) >= 2:
