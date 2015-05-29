@@ -2,12 +2,18 @@
 import presentation
 import re
 from pdf import generate_pdf, start
+import tempfile
 
 templates = {'presentation': presentation.translate}
 
 def compile_src(marktex_src, template='presentation'):
+    """
+    Compiles the Marktex source to a temporary PDF and returns its path.
+    """
     tex_src = templates[template](marktex_src)
-    return generate_pdf(tex_src)
+    temp_id, pdf_path = tempfile.mkstemp(suffix='.pdf')
+    generate_pdf(tex_src, pdf_path)
+    return pdf_path
 
 def compile_file(marktex_file, template='presentation'):
     with open(marktex_file) as file:
