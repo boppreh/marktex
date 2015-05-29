@@ -215,13 +215,7 @@ def apply(rules_list, src):
             src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
     return src
 
-def apply_rules(src):
-    # If the user uses section titles, but not slide titles, the slides will
-    # look weird. So it's best if we use the section slides as slide titles.
-    if not re.search(r'^## ', src, flags=re.MULTILINE):
-        src = re.sub(r'^#', r'##', src, flags=re.MULTILINE)
-        pass
-
+def translate(rules_list, src, header, footer):
     # To avoid processing what should be verbatim (`` and two-spaces indented)
     # we remove all verbatim code, replacing with a unique value, and reinsert
     # after all rules are done.
@@ -235,7 +229,7 @@ def apply_rules(src):
         return verbatim_replacement + str(n) + '!'
     src = re.sub(r'((?:^\s\s.*\n)+|`.*?[^\\]`)', remove_verbatim, src, flags=re.MULTILINE)
 
-    src = apply([presentation_rules, generic_rules], src)
+    src = apply(rules_list, src)
 
     def reinsert_verbatim(match):
         v = verbatims[int(match.group(1))]
@@ -248,6 +242,15 @@ def apply_rules(src):
         else:
             return '\\texttt{{\\lstinline{{{}}}}}'.format(v.strip('`'))
     src = re.sub(verbatim_replacement + r'(\d+)!', reinsert_verbatim, src)
+
+    return header + src + footer
+
+def translate_presentation(src):
+    # If the user uses section titles, but not slide titles, the slides will
+    # look weird. So it's best if we use the section slides as slide titles.
+    if not re.search(r'^## ', src, flags=re.MULTILINE):
+        src = re.sub(r'^#', r'##', src, flags=re.MULTILINE)
+        pass
 
     header = r"""
 \documentclass[10pt, compress]{beamer}
@@ -272,9 +275,9 @@ def apply_rules(src):
     footer = r'\end{document}'
 
 
-    return header + src + footer
+    return translate([presentation_rules, generic_rules], src, header, footer)
 
-def translate_presentation(tex_src):
+def generate_pdf(tex_src):
     old_dir = os.getcwd()
     os.chdir(os.path.join(os.path.dirname(__file__), 'resources'))
 
@@ -295,8 +298,8 @@ def translate_presentation(tex_src):
     return pdf_location
 
 def run(src, outfile):
-    tex_src = apply_rules(src)
-    pdf_location = translate_presentation(tex_src)
+    tex_src = translate_presentation(src)
+    pdf_location = generate_pdf(tex_src)
     os.rename(pdf_location, outfile)
 
 if __name__ == '__main__':
@@ -304,7 +307,7 @@ if __name__ == '__main__':
     if len(argv) <= 1:
         src = stdin.buffer.read().decode('utf-8')
         #src = '$$1 + 1 / 1 + 1\n1 * 1 / 1 * 1$$'
-        print(apply_rules(src))
+        print(translate_presentation(src))
         run(src, 'marktex.pdf')
         Popen([OPEN_COMMAND.format('marktex.pdf')], shell=True)
     elif len(argv) >= 2:
