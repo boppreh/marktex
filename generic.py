@@ -91,7 +91,7 @@ def include_image(match):
 \caption{{{}}}
 \end{{center}}
 \end{{figure}}
-""".format(path, match.groups(1))
+""".format(path, match.group(1))
 
 def include_math(match):
     text = match.group(1).strip()
