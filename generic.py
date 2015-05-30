@@ -72,11 +72,11 @@ def include_source(match):
     language = match.group(2)
     if language not in languages:
         language = 'latex'
-    path = os.path.abspath(match.group(1))
+    path = os.path.abspath(match.group(1)).replace('\\', '/')
     return r'\inputminted[fontsize=\small]{{{}}}{{{}}}'.format(language, path)
 
 def include_image(match):
-    path = os.path.abspath(match.groups()[-1])
+    path = os.path.abspath(match.groups()[-1]).replace('\\', '/')
     if len(match.groups()) == 1:
         return r"""
 \begin{{center}}
