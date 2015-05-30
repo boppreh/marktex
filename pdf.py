@@ -7,10 +7,10 @@ from shutil import copyfile
 import platform
 if platform.system() == 'Windows':
     XELATEX_LOCATION = r"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\miktex-xetex.exe"
-    OPEN_COMMAND = r'start "{}"'
+    OPEN_COMMAND = r'start'
 else:
     XELATEX_LOCATION = r"xelatex"
-    OPEN_COMMAND = r'xdg-open "{}"'
+    OPEN_COMMAND = r'xdg-open'
 
 def generate_pdf(tex_src, pdf_path):
     """
@@ -56,4 +56,4 @@ def start(file_location):
     """
     Displays a file by e.g. opening a PDF viewer, browser, etc.
     """
-    Popen([OPEN_COMMAND.format(file_location)], shell=True)
+    Popen([OPEN_COMMAND, file_location], shell=True)
