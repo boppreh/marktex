@@ -27,6 +27,7 @@ def compile_file(marktex_file, template='presentation'):
     return pdf_path
 
 if __name__ == '__main__':
+    #start(compile_src(r'$$inf$$')); exit()
     #start(compile_file('example.md')); exit()
     from sys import argv, stdin
     if len(argv) <= 1:
