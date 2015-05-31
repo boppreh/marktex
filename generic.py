@@ -127,6 +127,7 @@ def include_math(match):
     for rule, replacement in math_rules:
         text = text.replace(rule, replacement)
     text = re.sub(r'(^|[^a-zA-Z])(log|sin|cos|tan|lim|gcd|ln)([^a-zA-Z]|$)', r'\1\\\2\3', text)
+    text = re.sub(r'(^|[^a-zA-Z])(inf)([^a-zA-Z]|$)', r'\1\infty\3', text)
     if '\n' in text:
         text = re.sub(r'\n+', r'\\\\', text).strip('\n')
         return '\\begin{gather*}' + text + '\\end{gather*}'
