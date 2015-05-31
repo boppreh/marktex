@@ -99,7 +99,7 @@ def include_math(match):
     text = text.replace(')', '\\right)')
     text = text.replace('[', '\\left[')
     text = text.replace(']', '\\right]')
-    text = text.replace('/', '\\over')
+    text = text.replace('/', '\\div')
     text = text.replace('*', '\\times')
     text = re.sub(r'([^a-zA-Z])log([^a-zA-Z])', r'\1\\log\2', text)
     if '\n' in text:
