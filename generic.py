@@ -93,14 +93,39 @@ def include_image(match):
 \end{{figure}}
 """.format(path, match.group(1))
 
+math_rules = [
+    ['~~', '\\approx'],
+    ['~=', '\\congr'],
+    ['!=', '\\neq'],
+    ['!<=', '\\nleq'],
+    ['!>=', '\\ngeq'],
+    ['<=', '\\leq'],
+    ['>=', '\\qeg'],
+    ['+-', '\\pm'],
+
+    [' <-> ', ' \\leftrightarrow '],
+    [' <=> ', ' \\Leftrightarrow '],
+    [' |-> ', ' \\mapsto '],
+    [' <- ', ' \\leftarrow '],
+    [' <= ', ' \\Leftarrow '],
+    [' -> ', ' \\rightarrow '],
+    [' => ', ' \\Rightarrow '],
+
+    [' in ', ' \\in '],
+
+    ['(', '\\left('],
+    [')', '\\right)'],
+    ['[', '\\left['],
+    [']', '\\right]'],
+
+    ['/', '\\div'],
+    ['*', '\\times'],
+]
+
 def include_math(match):
     text = match.group(1).strip()
-    text = text.replace('(', '\\left(')
-    text = text.replace(')', '\\right)')
-    text = text.replace('[', '\\left[')
-    text = text.replace(']', '\\right]')
-    text = text.replace('/', '\\div')
-    text = text.replace('*', '\\times')
+    for rule, replacement in math_rules:
+        text = text.replace(rule, replacement)
     text = re.sub(r'([^a-zA-Z])(log|sin|cos|tan|lim|gcd|ln)([^a-zA-Z])', r'\1\\\2\3', text)
     if '\n' in text:
         text = re.sub(r'\n+', r'\\\\', text).strip('\n')
