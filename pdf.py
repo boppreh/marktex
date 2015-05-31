@@ -2,7 +2,6 @@ from subprocess import call, Popen
 import os
 from glob import glob
 from tempfile import TemporaryDirectory
-from shutil import move
 from zipfile import ZipFile
 
 import platform
@@ -39,7 +38,13 @@ def generate_pdf(tex_src, pdf_path):
             call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_path])
 
         print('Copying generated PDF to ', pdf_path)
-        move(os.path.join(temp_dir, pdf_basename), pdf_path)
+        # This is equivalent to shutil.copy. Unfortunately the shutil
+        # operations were leaving the file handle open, keeping the temporary
+        # folder from being deleted.
+        with open(os.path.join(temp_dir, pdf_basename), 'rb') as in_pdf_file:
+            with open(pdf_path, 'wb') as out_pdf_file:
+                out_pdf_file.write(in_pdf_file.read())
+
         os.chdir(old_dir)
 
 def start(file_location):
