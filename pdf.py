@@ -24,15 +24,19 @@ def generate_pdf(tex_src, pdf_path):
 
     old_dir = os.getcwd()
     with TemporaryDirectory() as temp_dir:
+        print('Navigating to temporary directory', temp_dir)
         os.chdir(temp_dir)
 
+        print('Extracting resources')
         with ZipFile(resources_zip) as zip_file:
             zip_file.extractall('.')
 
         tex_path = os.path.join(temp_dir, file_title + '.tex')
+        print('Creating .tex file at', tex_path)
         with open(tex_path, 'w') as tex_file:
             tex_file.write(tex_src)
 
+        print('Compiling...')
         # Without a second call some section titles get unaligned.
         for i in range(2):
             call([XELATEX_LOCATION, '-undump=xelatex', '-shell-escape', tex_path])
@@ -45,6 +49,7 @@ def generate_pdf(tex_src, pdf_path):
             with open(pdf_path, 'wb') as out_pdf_file:
                 out_pdf_file.write(in_pdf_file.read())
 
+        print('Navigating back to', old_dir)
         os.chdir(old_dir)
 
 def start(file_location):
