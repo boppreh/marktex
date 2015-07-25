@@ -200,10 +200,11 @@ def translate(extra_rules, src, header, footer):
     verbatims = []
 
     def remove_verbatim(match):
+        print(match.group(1))
         n = len(verbatims)
         verbatims.append(match.group(1))
         return verbatim_replacement + str(n) + '!'
-    src = re.sub(r'((?:^\s\s.*\n)+|`.*?[^\\]`)', remove_verbatim, src, flags=re.MULTILINE)
+    src = re.sub(r'((?:^[ \t]{2}.*\n)+|`.*?[^\\]`)', remove_verbatim, src, flags=re.MULTILINE)
 
     for rule, replacement in extra_rules + rules:
         src = re.sub(rule, replacement, src, flags=re.MULTILINE | re.DOTALL)
