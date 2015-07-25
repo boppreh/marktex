@@ -45,19 +45,14 @@ def translate(src):
         pass
 
     header = r"""
-\documentclass[10pt, compress]{beamer}
-
 \usetheme{m}
 
 \usepackage{amsmath}
 \usepackage{booktabs}
-\usepackage{minted}
 \usepackage{listings}
 
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,urlcolor=blue}
-
-\usemintedstyle{trac}
 
 \newcommand{\lasttitle}{}
 
@@ -66,4 +61,9 @@ def translate(src):
 
     footer = r'\end{document}'
 
-    return translate_generic(rules, src, header, footer)
+    result = translate_generic(rules, src, header, footer)
+    if 'minted' in result:
+        result = r"""\usepackage{minted}
+\usemintedstyle{trac}
+""" + result
+    return r'\documentclass[10pt, compress]{beamer}' + result
