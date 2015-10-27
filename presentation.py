@@ -54,6 +54,8 @@ def translate(src):
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,urlcolor=blue}
 
+\usepackage[ruled,vlined,boxed,linesnumbered]{algorithm2e}
+
 \newcommand{\lasttitle}{}
 
 \usepackage{mathtools}
