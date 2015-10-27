@@ -3,6 +3,10 @@
 resources/demo.pdf
 resources/images/*
 *.pygtex
+images/*
+*.png
+*.md
+*.pdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
