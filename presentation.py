@@ -56,6 +56,10 @@ def translate(src):
 
 \newcommand{\lasttitle}{}
 
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
 \begin{document}
 """
 
