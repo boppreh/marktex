@@ -118,8 +118,8 @@ math_rules = [
     ['[', '\\left['],
     [']', '\\right]'],
 
-    ['/', '\\div'],
-    ['*', '\\times'],
+    #['/', '\\div'],
+    #['*', '\\times'],
 ]
 
 def include_math(match):
