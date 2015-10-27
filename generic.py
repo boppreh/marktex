@@ -124,6 +124,7 @@ math_rules = [
 
 def include_math(match):
     text = match.group(1).strip()
+    text = re.sub(r'(\D)(\d+)(\D)', r'\1\3', text)
     for rule, replacement in math_rules:
         text = text.replace(rule, replacement)
     text = re.sub(r'(^|[^a-zA-Z])(log|sin|cos|tan|lim|gcd|ln)([^a-zA-Z]|$)', r'\1\\\2\3', text)
