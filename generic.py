@@ -93,6 +93,11 @@ def include_image(match):
 \end{{figure}}
 """.format(path, match.group(1))
 
+def include_latex(match):
+    path = os.path.abspath(match.groups()[-1]).replace('\\', '/')
+    return r'\input{' + path + '}'
+
+
 math_rules = [
     ['~~', '\\approx'],
     ['~=', '\\congr'],
@@ -160,6 +165,9 @@ rules = [
 
         # Simple images using !(image.jpg) syntax.
         (r'^!\(([^)]+?\.(?:jpg|jpeg|gif|png|bmp|pdf|tif))\)$', include_image),
+
+        # Latex embedding with !(text.tex) syntax.
+        (r'^!\(([^)]+?\.tex)\)$', include_latex),
 
         # Code embedding with !(code.py) syntax.
         (r'^!\(([^)]+?\.(\w+))\)$', include_source),
