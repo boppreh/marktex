@@ -110,13 +110,13 @@ math_rules = [
     ['>=', '\\qeg'],
     ['+-', '\\pm'],
 
-    [' <-> ', ' \\leftrightarrow '],
-    [' <=> ', ' \\Leftrightarrow '],
-    [' |-> ', ' \\mapsto '],
-    [' <- ', ' \\leftarrow '],
-    [' <= ', ' \\Leftarrow '],
-    [' -> ', ' \\rightarrow '],
-    [' => ', ' \\Rightarrow '],
+    [' <-> ', '\\leftrightarrow'],
+    [' <=> ', '\\Leftrightarrow'],
+    [' |-> ', '\\mapsto'],
+    [' <- ', '\\leftarrow'],
+    [' <= ', '\\Leftarrow'],
+    [' -> ', '\\rightarrow'],
+    [' => ', '\\Rightarrow'],
 
     [' in ', ' \\in '],
     [' mod ', ' \\mod '],
@@ -137,7 +137,7 @@ def include_math(match):
     # Group numbers to avoid problems with x^123 .
     text = re.sub(r'(-?\d+)', r'{\1}', text)
     for rule, replacement in math_rules:
-        text = text.replace(rule, replacement)
+        text = text.replace(rule, ' {} '.format(replacement))
     text = re.sub(r'(^|[^a-zA-Z])(log|sin|cos|tan|lim|gcd|ln)([^a-zA-Z]|$)', r'\1\\\2\3', text)
     text = re.sub(r'(^|[^a-zA-Z])(inf)([^a-zA-Z]|$)', r'\1\infty\3', text)
     if multiline:
