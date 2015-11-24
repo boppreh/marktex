@@ -131,7 +131,8 @@ math_rules = [
 
 def include_math(match):
     text = match.group(1).strip()
-    text = re.sub(r'(\D)(\d{2,})(\D)', r'\1{\2}\3', text)
+    # Group numbers to avoid problems with x^123 .
+    text = re.sub(r'(-?\d+)', r'{\1}', text)
     for rule, replacement in math_rules:
         text = text.replace(rule, replacement)
     text = re.sub(r'(^|[^a-zA-Z])(log|sin|cos|tan|lim|gcd|ln)([^a-zA-Z]|$)', r'\1\\\2\3', text)
