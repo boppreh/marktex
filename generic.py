@@ -130,14 +130,16 @@ math_rules = [
 ]
 
 def include_math(match):
-    text = match.group(1).strip()
+    text = match.group(1)
+    multiline = '\n' in text
+    text = text.strip()
     # Group numbers to avoid problems with x^123 .
     text = re.sub(r'(-?\d+)', r'{\1}', text)
     for rule, replacement in math_rules:
         text = text.replace(rule, replacement)
     text = re.sub(r'(^|[^a-zA-Z])(log|sin|cos|tan|lim|gcd|ln)([^a-zA-Z]|$)', r'\1\\\2\3', text)
     text = re.sub(r'(^|[^a-zA-Z])(inf)([^a-zA-Z]|$)', r'\1\infty\3', text)
-    if '\n' in text:
+    if multiline:
         text = re.sub(r'\n+', r'\\\\', text).strip('\n')
         return '\\begin{gather*}' + text + '\\end{gather*}'
     else:
