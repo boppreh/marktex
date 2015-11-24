@@ -51,6 +51,7 @@ def generate_pdf(tex_src, pdf_path):
 
         print('Navigating back to', old_dir)
         os.chdir(old_dir)
+        print(tex_src)
 
 def start(file_location):
     """
