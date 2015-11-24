@@ -99,6 +99,7 @@ def include_latex(match):
 
 
 math_rules = [
+    ['*', '\\cdot'],
     ['~~', '\\approx'],
     ['~=', '\\congr'],
     ['==', '\\equiv'],
