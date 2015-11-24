@@ -101,6 +101,7 @@ def include_latex(match):
 math_rules = [
     ['~~', '\\approx'],
     ['~=', '\\congr'],
+    ['==', '\\equiv'],
     ['!=', '\\neq'],
     ['!<=', '\\nleq'],
     ['!>=', '\\ngeq'],
@@ -117,6 +118,7 @@ math_rules = [
     [' => ', ' \\Rightarrow '],
 
     [' in ', ' \\in '],
+    [' mod ', ' \\mod '],
 
     ['(', '\\left('],
     [')', '\\right)'],
