@@ -34,6 +34,7 @@ def generate_pdf(tex_src, pdf_path):
         tex_path = os.path.join(temp_dir, file_title + '.tex')
         print('Creating .tex file at', tex_path)
         with open(tex_path, 'w') as tex_file:
+            print(tex_src)
             tex_file.write(tex_src)
 
         print('Compiling...')

@@ -141,8 +141,8 @@ def include_math(match):
     text = re.sub(r'(^|[^a-zA-Z])(log|sin|cos|tan|lim|gcd|ln)([^a-zA-Z]|$)', r'\1\\\2\3', text)
     text = re.sub(r'(^|[^a-zA-Z])(inf)([^a-zA-Z]|$)', r'\1\infty\3', text)
     if multiline:
-        text = re.sub(r'\n+', r'\\\\', text).strip('\n')
-        return '\\begin{gather*}' + text + '\\end{gather*}'
+        text = re.sub(r'\n+', r'\\\\''\n', text).strip('\n')
+        return '\\begin{gather*}\n' + text + '\n\\end{gather*}'
     else:
         return '$' + text + '$'
 
@@ -150,6 +150,9 @@ def include_math(match):
 rules = [
         # Latex hates unescaped characters.
         (r'([$#%])', r'\\\1'),
+
+        # Replace single linebreaks with double linebreaks.
+        (r'([^\n])\n([^\n])', r'\1\n\n\2'),
 
         # Annotations using {text}(annotation) syntax.
         # Hackish because we enter math mode needlessly, but I found no other
@@ -194,9 +197,6 @@ r"""
 \1
 \\end{itemize}
 """),
-
-        # Replace single linebreaks with double linebreaks.
-        (r'([^\n])\n([^\n])', r'\1\n\n\2'),
 
         # **bold**
         (r'(^|\W)\*\*(.+?)\*\*([^\w\d*]|$)', r'\1\\textbf{\2}\3'),
