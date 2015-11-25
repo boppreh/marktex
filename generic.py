@@ -142,6 +142,8 @@ def include_math(match):
     text = re.sub(r'(^|[^a-zA-Z])(inf)([^a-zA-Z]|$)', r'\1\infty\3', text)
     if multiline:
         text = re.sub(r'\n+', r'\\\\''\n', text).strip('\n')
+        if '&' in text:
+            text = '\\begin{aligned}\n' + text + '\n\\end{aligned}'
         return '\\begin{gather*}\n' + text + '\n\\end{gather*}'
     else:
         return '$' + text + '$'
